@@ -53,7 +53,7 @@ jobs:
           path: newman-report.html
           retention-days: 7
 
-      - name: Upload Allure results
+      - name: Upload Allure results (raw)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -61,19 +61,16 @@ jobs:
           path: allure-results/
           retention-days: 7
 
-      - name: Generate and publish Allure report
+      - name: Generate Allure report
         if: always()
-        uses: simple-elf/allure-report-action@master
-        with:
-          allure_results: allure-results
-          gh_pages: gh-pages
-          allure_report: allure-report
-          allure_history: allure-history
+        run: |
+          npx allure generate allure-results -o allure-report --clean
+        continue-on-error: false
 
-      - name: Deploy Allure report to GitHub Pages
+      - name: Upload Allure report
         if: always()
-        uses: peaceiris/actions-gh-pages@v4
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
-          destination_dir: allure-history
+          name: allure-report
+          path: allure-report/
+          retention-days: 7
